@@ -1,0 +1,81 @@
+{% extends 'base.html'%} {% block head %}
+<title>Register | techforum</title>
+{% endblock %} {% load static %} {% block content %}
+<div class="h-screen flex items-center justify-center">
+    <div class="w-full m-2 md:w-6/12 flex items-center justify-center">
+        <form class="w-full md:w-6/12" method="POST">
+            {% csrf_token %}
+
+            <h2 class="block md:hidden mx-2 my-4 text-2xl font-bold">Register</h2>
+            <!-- ERROR MESSAGE -->
+            {% for message in messages %}
+            <div class="m-2">
+                <p class="text-red-500">{{message}} *</p>
+            </div>
+            {% endfor %}
+
+            <!-- FIRST NAME -->
+            <div class="input my-2">
+                <label htmlFor="fname" class="text-lg block mb-2">First Name</label>
+                <input required type="text" name="fname" id="fname" placeholder="Enter your first name"
+                    class="mb-4 p-2 w-full text-xl bg-white focus:outline-blue-400 border-2 border-white rounded shadow-lg" />
+            </div>
+
+            <!-- LAST NAME -->
+            <div class="input my-2">
+                <label htmlFor="lname" class="text-lg block mb-2">Last Name</label>
+                <input required type="text" name="lname" id="lname" placeholder="Enter your last name"
+                    class="mb-4 p-2 w-full text-xl bg-white focus:outline-blue-400 border-2 border-white rounded shadow-lg" />
+            </div>
+
+            <!-- USERNAME -->
+            <div class="input my-2">
+                <label htmlFor="username" class="text-lg block mb-2">Username</label>
+                <input required type="username" name="username" id="username" placeholder="Enter username"
+                    class="mb-4 p-2 w-full text-xl bg-white focus:outline-blue-400 border-2 border-white rounded shadow-lg" />
+            </div>
+
+            <!-- EMAIL -->
+            <div class="input my-2">
+                <label htmlFor="email" class="text-lg block mb-2">Email</label>
+                <input required type="email" name="email" id="email" placeholder="Enter your email"
+                    class="mb-4 p-2 w-full text-xl bg-white focus:outline-blue-400 border-2 border-white rounded shadow-lg" />
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="input my-2">
+                <label htmlFor="pass1" class="text-lg block mb-2">Password</label>
+                <input required type="password" name="pass1" id="pass1" placeholder="Enter password"
+                    class="mb-4 p-2 w-full text-xl bg-white focus:outline-blue-400 border-2 border-white rounded shadow-lg" />
+            </div>
+
+            <!-- CONFIRM PASSWORD -->
+            <div class="input my-2">
+                <label htmlFor="pass2" class="text-lg block mb-2">Confirm password</label>
+                <input required type="password" name="pass2" id="pass2" placeholder="Re-enter password"
+                    class="mb-4 p-2 w-full text-xl bg-white focus:outline-blue-400 border-2 border-white rounded shadow-lg" />
+            </div>
+
+            <!-- SUBMIT -->
+            <div>
+                <input
+                    class="w-full bg-blue-500 text-lg text-white p-3 text-center rounded cursor-pointer shadow-blue-300 shadow-lg hover:bg-blue-600"
+                    type="submit" value="Register" />
+            </div>
+
+            <div class="m-4">
+                <p class="text-gray-700 text-sm text-center">
+                    By clicking register, you agree to our Terms and Policies
+                </p>
+            </div>
+
+            <div class="m-4">
+                <p class="text-gray-700 text-center">
+                    Already a member?
+                    <a class="text-blue-500" href="{% url 'signin' %}">Log in</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

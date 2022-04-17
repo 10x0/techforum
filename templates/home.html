@@ -1,0 +1,103 @@
+<!-- QUESTION CARD -->
+<section class="max-w-screen-md m-auto my-24">
+    <div id="stream-content" class="stream-content">
+</section>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+    integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    var eventSource = new EventSource("{% url 'question_stream' %}");
+
+    eventSource.onopen = function () {
+        console.log('Yay! its open?');
+    }
+
+    eventSource.onmessage = function (e) {
+        final_data = JSON.parse(e.data)
+        content = "";
+
+        final_data.forEach(function (item) {
+            content += buildPostContent(item)
+        })
+        console.log(content);
+        document.getElementById('stream-content').innerHTML = content;
+    }
+
+    eventSource.onerror = function (e) {
+        console.log(`error ${e}`);
+    }
+
+    function buildPostContent(item) {
+        fromNow = getFromNow(item.date_updated)
+        content = `
+            <div class="m-4 my-8 p-4 bg-white shadow-lg rounded-lg text-lg">
+                <section class="mb-2">
+                    <div class="font-semibold">Q. ${item.question}</div>
+                    <p class="mx-1 text-sm text-gray-400 flex">${fromNow} by @${item.questioner}
+                    </p>
+                    <div>${item.brief}</div>
+                         ${item.image &&
+            `<div class="my-4 w-full h-80 rounded-lg"
+                    style="background: url('media/${item.image}'); background-size: cover; background-position: center;">
+                    <img class="w-full h-full object-contain backdrop-blur rounded"
+                        src="media/${item.image}"
+                        alt="post" />
+                </div>`}
+            
+                </section >
+            <section class="flex justify-between">
+                <aside class="flex">
+      
+                    <div
+                    onClick="like(${item.id})"
+                        class="cursor-pointer px-2 text-gray-500 bg-blue-100 hover:text-white hover:bg-blue-500 rounded-xl mx-1">
+                        <i class="fa-solid fa-thumbs-up mr-2"></i>${item.likes.length}
+                    </div>
+                    <div
+                        class="cursor-pointer px-2 text-gray-500 bg-blue-100 hover:text-white hover:bg-blue-500 rounded-xl mx-1">
+                        <i class="fa-solid fa-reply mr-2"></i>${item.answers.length}
+                    </div>
+                </aside>
+                <a href="{% url 'view_question_thread' qid='1' %}" class="text-blue-600 underline decoration-2 underline-offset-2 cursor-pointer">View thread</a>
+            </section>
+            </div >
+       `;
+
+        return content
+
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function like(id) {
+        const csrftoken = getCookie('csrftoken');
+        fetch(`like/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+            }
+        }).catch(error => console.log(error))
+    }
+
+    function getFromNow(dt) {
+        let dt1 = new Date(dt);
+        return moment(dt1).fromNow();
+    }
+</script>

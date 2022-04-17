@@ -1,0 +1,31 @@
+{% extends 'base.html'%} {% block head %}
+<title>Add question | techforum</title>
+{% endblock %} {% load static %} {% block content %}
+<section class="max-w-screen-md m-auto my-24">
+    &leftarrow;<a href="{{request.META.HTTP_REFERER}}"
+        class="cursor-pointer mb-8 text-center underline underline-offset-2">Go back</a>
+    <div class="m-4 my-8 p-4 bg-white shadow-lg rounded-lg text-lg">
+        <section class="mb-2">
+            <div class="font-semibold">Q. {{question.question}}</div>
+            <p class="mx-1 text-sm text-gray-400 flex">${fromNow} by @${{question.questioner}}
+            </p>
+            <div>{{question.brief}}</div>
+            {% if question.image %}
+            `<div class="my-4 w-full h-80 rounded-lg"
+                style="background: url('media/{{item.image}}'); background-size: cover; background-position: center;">
+                <img class="w-full h-full object-contain backdrop-blur rounded" src="media/{{question.image}}"
+                    alt="post" />
+            </div>
+            {% endif %}
+        </section>
+        <section class="flex justify-between">
+            <aside class="flex">
+                <div
+                    class="cursor-pointer px-2 text-gray-500 bg-blue-100 hover:text-white hover:bg-blue-500 rounded-xl mx-1">
+                    <i class="fa-solid fa-thumbs-up mr-2"></i>{{question.likes_count}}
+                </div>
+            </aside>
+        </section>
+    </div>
+</section>
+{% endblock %}

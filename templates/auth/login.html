@@ -1,0 +1,51 @@
+{% extends 'base.html'%} {% block head %}
+<title>Log in | techforum</title>
+{% endblock %} {% load static %} {% block content %}
+<div class="h-screen flex items-center justify-center">
+    <div class="w-full m-2 md:w-6/12 flex items-center justify-center">
+        <form class="w-full md:w-6/12" method="POST">
+            {% csrf_token %}
+
+            <h2 class="block my-4 text-2xl font-bold">Log in</h2>
+
+            <!-- ERROR MESSAGE -->
+            {% for message in messages %}
+            <div class="m-2">
+                <!-- {% if message.username != "" %} -->
+                <p class="text-red-500">{{message}} *</p>
+                <!-- {% endif %} -->
+            </div>
+            {% endfor %}
+
+            <!-- USERNAME -->
+            <div class="input my-2">
+                <label htmlFor="username" class="text-lg block mb-2">Username</label>
+                <input required type="username" name="username" id="username" placeholder="Enter username"
+                    class="mb-4 p-2 w-full text-xl bg-gray-200 focus:outline-blue-400 border-2 rounded" />
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="input my-2">
+                <label htmlFor="pass1" class="text-lg block mb-2">Password</label>
+                <input required type="password" name="pass1" id="pass1" placeholder="Enter password"
+                    class="mb-4 p-2 w-full text-xl bg-gray-200 focus:outline-blue-400 border-2 rounded" />
+            </div>
+
+            <!-- SUBMIT -->
+            <div>
+                <input
+                    class="w-full bg-blue-500 text-lg text-white p-3 text-center rounded cursor-pointer shadow-blue-300 shadow-lg hover:bg-blue-600"
+                    type="submit" value="Log in" />
+            </div>
+
+            <div class="m-4">
+                <p class="text-gray-700 text-center">
+                    Don't have an account?
+                    <a class="text-blue-500" href="{% url 'register' %}">Register</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% load static %}
+<header class="flex items-center justify-between px-4 md:px-12 py-3 bg-white fixed top-0 z-10 w-full shadow-sm">
+
+    <a href="{% url 'home' %}" class="font-bold text-lg text-blue-500">techforum</a>
+
+    <!-- SEARCH BAR -->
+    <section class="searchbar w-1/2 flex items-center rounded-lg bg-gray-100 p-2 shadow">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" placeholder="Search"
+            class="w-full flex ml-2 items-center bg-transparent outline-none placeholder-gray-500 text-lg" />
+    </section>
+
+    {% if user.is_authenticated %}
+
+    <!-- USER AVATAR -->
+    <section class="flex items-center">
+        <i class="fa-solid fa-bell cursor-pointer text-lg mr-3 md:mr-5 relative">
+            <span class="absolute w-2 h-2 rounded-full top-0 right-0 bg-red-500"></span>
+        </i>
+        <section class="cursor-pointer group flex items-center relative">
+            <aside
+                class="shadow-lg shadow-blue-200 w-10 h-10 rounded-full bg-blue-500 text-white grid place-items-center text-lg font-bold">
+                {{user.username|make_list|first|title}}
+            </aside>
+            <section
+                class="w-60 hidden group-hover:inline-flex flex-col absolute right-0 top-full bg-white p-4 rounded-lg shadow-lg text-lg">
+                <a class="my-1 px-4 py-2 hover:bg-gray-200 hover:text-blue-500 rounded-lg"><i
+                        class="fa-solid fa-user pr-2"></i>My
+                    Profile</a>
+                <a href="{% url 'signout' %}" class="my-1 px-4 py-2 hover:bg-gray-200 hover:text-blue-500 rounded-lg">
+                    <i class="fa-solid fa-arrow-right-from-bracket pr-2"></i>
+                    Log Out </a>
+            </section>
+        </section>
+    </section>
+
+    {% else %}
+
+    <!-- AUTH BUTTONS -->
+    <section class="flex">
+        <a href="{% url 'signin' %}" class="mx-2 p-2 px-4 cursor-pointer hover:underline hover:decoration-2">
+            Login
+        </a>
+        <a href="{% url 'register' %}"
+            class="mx-2 p-2 px-4 rounded bg-blue-500 hover:bg-blue-600 text-white cursor-pointer shadow-blue-300 shadow-lg">
+            Get Started
+        </a>
+    </section>
+
+    {% endif %}
+
+</header>

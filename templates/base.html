@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% block head %}
+  <title>techforum | Best forum for next tech leaders</title>
+  {% endblock %}
+  <!-- FONTAWESOME -->
+  <script src="https://kit.fontawesome.com/f9f03dcea6.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="h-screen bg-indigo-50">
+  {% include 'header.html' %}
+
+  {% block content %}
+
+  {% include 'home.html' %}
+
+  <!-- ADD QUESTION -->
+  <section class="fixed top-40 right-96">
+    <a href="{% url 'add_question' %}"
+      class="hidden bg-blue-500 hover:bg-blue-600 text-white cursor-pointer shadow-blue-300 shadow-lg 2xl:inline 2xl:mx-2 2xl:p-2 2xl:px-4 2xl:rounded">
+      &plus; Add question
+    </a>
+  </section>
+
+  <a href="{% url 'add_question' %}"
+    class="2xl:hidden fixed bottom-4 right-4 z-40 w-16 h-16 bg-blue-500 hover:bg-blue-600 text-white cursor-pointer shadow-blue-300 shadow-lg rounded-full inline-flex justify-center items-center text-2xl font-bold">
+    +
+  </a>
+  {% endblock %}
+</body>
+
+</html>
