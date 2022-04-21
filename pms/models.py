@@ -1,3 +1,4 @@
+import json
 from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
@@ -19,7 +20,6 @@ class Answer(models.Model):
         data['image'] = str(self.image)
         data['date_updated'] = self.date_updated
         data['likes'] = [like.username for like in self.likes.all()]
-        # data['likes'] = [like.get_json() for like in self.likes.all()]
         return data
 
 
@@ -45,18 +45,19 @@ class Question(models.Model):
         return self.answers.all().count()
 
     def get_sorted_answers(self):
-        return self.answers.all().order_by('-date_updated')
+        return self.answers.all().order_by('likes')
 
     def get_json(self):
         data = {'id': self.id}
         data['questioner'] = self.questioner.username
         data['question'] = self.question
         data['brief'] = self.brief
-        data['image'] = str(self.image)
+        if self.image:
+            data['image'] = str(self.image.url)
         data['date_updated'] = self.date_updated
         data['likes'] = [like.username for like in self.likes.all()]
-        # data['likes'] = [like.get_json() for like in self.likes.all()]
-        data['answers'] = [answer.get_json() for answer in self.answers.all()]
+        data['answers'] = [answer.get_json()
+                           for answer in self.get_sorted_answers().all()]
         return data
 
 

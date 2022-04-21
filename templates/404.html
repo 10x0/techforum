@@ -1,0 +1,13 @@
+{% extends 'base.html'%} {% block head %}
+<title>Not Found | techforum</title>
+{% endblock %} {% load static %} {% block content %}
+asf
+<section class="max-w-screen-md m-auto my-24">
+    &leftarrow;<span onclick="history.back()"
+        class="cursor-pointer mb-8 text-center underline underline-offset-2">Go back</span>
+    <div class="m-4 my-8 p-4 bg-white shadow-lg rounded-lg text-lg">
+        <p class="text-center text-2xl font-semibold">OOPS! Looks like page you are requesting has been taken away.</p>
+            <img src="{% static 'illustrations/404.svg' %}" alt="404" />
+    </div>
+</section>
+{% endblock %}

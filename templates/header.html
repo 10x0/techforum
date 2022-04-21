@@ -4,22 +4,34 @@
     <a href="{% url 'home' %}" class="font-bold text-lg text-blue-500">techforum</a>
 
     <!-- SEARCH BAR -->
-    <section class="searchbar w-1/2 flex items-center rounded-lg bg-gray-100 p-2 shadow">
+    <section class="relative searchbar w-1/2 flex items-center rounded-lg bg-gray-100 p-2 shadow">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
-        <input type="text" placeholder="Search"
+        <input type="text" placeholder="Search" oninput="search(event)"
             class="w-full flex ml-2 items-center bg-transparent outline-none placeholder-gray-500 text-lg" />
+            
+            <div class="hidden max-h-80 w-full absolute top-full bg-white rounded shadow-lg" id="search-content">
+            </div>
+            
     </section>
 
     {% if user.is_authenticated %}
 
     <!-- USER AVATAR -->
     <section class="flex items-center">
-        <i class="fa-solid fa-bell cursor-pointer text-lg mr-3 md:mr-5 relative">
-            <span class="absolute w-2 h-2 rounded-full top-0 right-0 bg-red-500"></span>
-        </i>
+        <div class="cursor-pointer mr-3 md:mr-5 relative group flex items-center relative">
+            <i class="fa-solid fa-bell text-lg" id="bell">
+                <span id="notifier" class="hidden absolute w-2 h-2 rounded-full top-0 right-0 bg-red-500">
+                </span>
+            </i>
+            <section
+                class="hidden group-hover:inline-flex flex-col absolute right-0 top-full bg-white p-2 rounded-lg shadow-lg">
+                <div id="notification-stream-content" class="text-sm notification-stream-content">
+                </div>
+            </section>
+        </div>
         <section class="cursor-pointer group flex items-center relative">
             <aside
                 class="shadow-lg shadow-blue-200 w-10 h-10 rounded-full bg-blue-500 text-white grid place-items-center text-lg font-bold">
@@ -27,9 +39,8 @@
             </aside>
             <section
                 class="w-60 hidden group-hover:inline-flex flex-col absolute right-0 top-full bg-white p-4 rounded-lg shadow-lg text-lg">
-                <a class="my-1 px-4 py-2 hover:bg-gray-200 hover:text-blue-500 rounded-lg"><i
-                        class="fa-solid fa-user pr-2"></i>My
-                    Profile</a>
+                <p class="my-1 px-4 py-2"><i
+                        class="fa-solid fa-user pr-2"></i>{{user.username}}</p>
                 <a href="{% url 'signout' %}" class="my-1 px-4 py-2 hover:bg-gray-200 hover:text-blue-500 rounded-lg">
                     <i class="fa-solid fa-arrow-right-from-bracket pr-2"></i>
                     Log Out </a>
@@ -53,3 +64,130 @@
     {% endif %}
 
 </header>
+
+<script>
+    "{% if user.is_authenticated %}"
+    var notificationEventSource = new EventSource("{% url 'notification_stream' %}");
+    "{% endif %}"
+
+    notificationEventSource.onopen = function () {
+        console.log('___notification_stream___ connected successfully.');
+    }
+
+    notificationEventSource.onmessage = function (e) {
+        final_data = JSON.parse(e.data)
+        content = "";
+
+        final_data.forEach(function (item) {
+            content += buildNotificationContent(item)
+        })
+
+        let notificationContentElement = document.getElementById('notification-stream-content');
+        let notificationIndicator = document.getElementById('notifier');
+        let notificationBellElement = document.getElementById('bell');
+        if (content !== "") {
+            notificationContentElement.innerHTML = content;
+            notificationIndicator.style.display = 'inline';
+            notificationBellElement.classList.add('animate-[bounce_1s]');
+            setTimeout(() =>
+                notificationBellElement.classList.remove('animate-[bounce_1s]')
+                , [1000]);
+        } else {
+            notificationContentElement.innerHTML = "<p>No notifcations.</p>";
+            notificationIndicator.style.display = 'none';
+        }
+    }
+
+    notificationEventSource.onerror = function (e) {
+        console.log(`error ${e}`);
+    }
+
+    function buildNotificationContent(item) {
+        let fromNow = getFromNow(item.date_updated)
+        content = `
+                <section onclick="view_notification(${item.id},${item.question.id})" class="w-32 sm:w-60 md:w-80 flex flex-col p-2 hover:bg-gray-200 rounded-lg">
+                    <div class='font-semibold'>${item.notification_text}</div>
+                    <p class='text-sm text-gray-400'>${fromNow}</p>
+                    <p>Q.${item.question.question}</p>
+                    <p>${item.seen}</p>
+                </section>
+       `;
+
+        return content
+
+    }
+
+    function buildSearchContent(question) {
+        content = `
+                <a href="/question/${question.id}" class="block cursor-pointer hover:bg-gray-300 m-2 p-2 px-6 rounded border-gray-100">
+                    <p class="font-semibold text-l">Q. ${question.question}</p>
+                    <p class="px-6">${question.brief.length > 50 ? question.brief.slice(0,50):question.brief}&nbsp;&nbsp;&nbsp;...</p>
+                </a>
+                <hr />
+       `;
+
+        return content
+
+    }
+
+    function getFromNow(dt) {
+        let dt1 = new Date(dt);
+        return moment(dt1).fromNow();
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function view_notification(nid,qid) {
+        const csrftoken = getCookie('csrftoken');
+        fetch(`view_notification/${nid}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+            }
+        }).then(res=>location.pathname = `/question/${qid}`).catch(error => console.log(error))
+    }
+
+    function search(event) {
+        let searchContentElement = document.getElementById('search-content');
+        if(event.target.value===""){ searchContentElement.style.display = 'none'};
+        const csrftoken = getCookie('csrftoken');
+        fetch(`{% url 'search' %}?q=${event.target.value}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+            }
+        }).then(res=>res.json())
+        .then(res=>{
+            if(res.data.length > 0){
+                console.log(res);
+                let content = ""
+                res.data.forEach(function (item) {
+                    let question = item;
+                    content += buildSearchContent(question);
+                })
+                
+                searchContentElement.style.display = 'inline';
+                searchContentElement.innerHTML = content;
+            } else {
+                if(event.target.value===""){ searchContentElement.style.display = 'none'};
+            }
+        })
+        .catch(error => console.log(error))
+    }
+</script>

@@ -56,6 +56,7 @@ target/
 # Vim
 .ropeproject
 
-# db
+# data
 data/
 media/
+esdata/
