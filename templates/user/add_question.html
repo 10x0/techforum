@@ -1,12 +1,10 @@
 {% extends 'base.html'%} {% block head %}
 <title>Add question | techforum</title>
 {% endblock %} {% load static %} {% block content %}
-<section class="max-w-screen-md m-auto my-24">
+<section class="max-w-screen-md m-auto my-24" id="main">
     &leftarrow;<span onclick="history.back()"
         class="cursor-pointer mb-8 text-center underline underline-offset-2">Go back</span>
     <div class="m-4 p-4 bg-white shadow-lg rounded-lg text-lg">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
             <label class="text-2xl">What do you want to ask ?</label>
             <input required class="w-full block my-2 p-4 border-2 rounded" type="text" name="question"      id="question"
                 placeholder="Question" 
@@ -31,16 +29,76 @@
                 <div class="my-3">
                     <img id="loadImage" class="m-auto" style="max-width: 200px; display: none;" />
                 </div>
-                <input
+                <button id="action"
+                onclick="checkQuestion()"
                     class="bg-blue-500 text-lg text-white w-full py-2 text-center rounded cursor-pointer hover:bg-blue-600 shadow-lg shadow-blue-300"
-                    type="submit" value="Submit" />
+                     >Submit</button>
+
 </section>
-</form>
 </div>
 <section class="hidden max-w-screen-md m-auto my-24 bg-white p-4" id="suggestion-content">
 </section>
 </section>
+<section id="modal" class="hidden fixed bg-white rounded-lg shadow-lg top-60 h-1/2 w-1/2 left-1/4 p-10">
+    <div class="font-bold mb-10 text-2xl">Confirm question</div>
+<section id="content"></section>    
+</section>
 <script>
+
+    async function checkQuestion(event){
+        const csrftoken = getCookie('csrftoken');
+        let question = document.querySelector("#question").value;
+        let brief = document.querySelector("#brief").value;
+        let action = document.querySelector('#action');
+        action.disabled = true;
+        await fetch('{{BASE_URL}}/check_question/',{
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+            },
+            body:JSON.stringify({question,brief})
+        }).then(res=>res.json()).then(data=>{
+            console.log(data);
+            let main = document.querySelector('#main');
+            let modal = document.querySelector('#modal');
+            let content = document.querySelector('#content');
+            main.classList.add('blur');
+            modal.style.display = 'block';
+            content.innerHTML = `<section class="my-8 text-lg font-semibold">
+        <div id="question">Actual question: ${data.question}</div>
+        <div id="corrected_question">Corrected question:${data.corrected_question}.</div>
+    </section>
+    <section class="my-8 font-medium text-lg">
+        <div id="brief">Actual brief: ${data.brief}</div>
+        <div id="corrected_brief">Corrected brief: ${data.corrected_brief}</div>
+    </section>
+    <section class='flex justify-between gap-10'>
+        <button onClick="add_question('${data.question}','${data.brief}')" class='bg-gray-400 text-lg text-white w-full py-2 text-center rounded cursor-pointer hover:bg-gray-500 shadow-lg'>Submit actual</button>    
+        <button onClick="add_question('${data.corrected_question}','${data.corrected_brief}')" class='bg-blue-500 text-lg text-white w-full py-2 text-center rounded cursor-pointer hover:bg-blue-600 shadow-lg shadow-blue-300'>Submit corrected</button>    
+    </section>
+    `
+        }).catch(error=>console.log(error))
+    }
+
+    async function add_question(question,brief){
+        const csrftoken = getCookie('csrftoken');
+        let image = document.querySelector('#fileInput') 
+        var formData = new FormData();
+        formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+        formData.append('question', question);
+        formData.append('brief', brief);
+        image.files[0]!==undefined && formData.append('image', image.files[0]);
+        
+        await fetch('{{BASE_URL}}/add_question/',{
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            body:formData
+        }).then(res=>location.pathname = '/').catch(err=>console.log(err))
+    }
+
     var loadFile = function (event) {
         var image = document.getElementById('loadImage');
         image.src = URL.createObjectURL(event.target.files[0]);

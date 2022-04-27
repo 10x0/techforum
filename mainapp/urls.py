@@ -5,7 +5,7 @@ from django.conf.urls import handler404
 from .views import index, error404
 from search.views import search
 from ums.views import signin, register, signout
-from pms.views import add_answer, add_question, delete_answer, delete_question, like_answer, like_question, notification_stream, question_stream, question_thread, question_thread_stream, view_notification
+from pms.views import add_answer, add_question, check_question, delete_answer, delete_question, like_answer, like_question, notification_stream, question_stream, question_thread, question_thread_stream, view_notification
 
 urlpatterns = [
     path('', index, name='home'),
@@ -13,6 +13,7 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('signout/', signout, name='signout'),
     path('add_question/', add_question, name='add_question'),
+    path('check_question/', check_question, name='check_question'),
     path('add_answer/<int:qid>', add_answer, name='add_answer'),
     path('question/<int:qid>', question_thread,
          name='view_question_thread'),

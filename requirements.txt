@@ -3,3 +3,4 @@ psycopg2
 Pillow
 autocorrect
 django-elasticsearch-dsl
+language-tool-python

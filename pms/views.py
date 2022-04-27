@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+import language_tool_python
 
 # import language_tool_python
 from notification.models import Notification
@@ -13,8 +14,26 @@ from pms.models import Answer, Question
 
 
 @login_required(login_url='signin')
+def check_question(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode("utf-8"))
+        question = data['question']
+        brief = data['brief']
+        tool = language_tool_python.LanguageToolPublicAPI('en-US')
+        question_matches = tool.check(question)
+        brief_matches = tool.check(brief)
+        cq = language_tool_python.utils.correct(question, question_matches)
+        cb = language_tool_python.utils.correct(brief, brief_matches)
+        return JsonResponse({
+            'question': question,
+            'corrected_question': cq,
+            'brief': brief,
+            'corrected_brief': cb
+        })
+
+
+@login_required(login_url='signin')
 def add_question(request):
-    # tool = language_tool_python.LanguageTool('en-US')
     if request.method == 'POST':
         q = Question()
         if len(request.FILES) != 0:
@@ -23,11 +42,7 @@ def add_question(request):
         q.question = request.POST['question']
         q.brief = request.POST['brief']
         q.save()
-        # matches = tool.check(q.question)
-        # cq = language_tool_python.utils.correct(q.question, matches)
-        # print(cq)
-        return redirect('home')
-
+        return JsonResponse({'success': True})
     return render(request, 'user/add_question.html')
 
 
@@ -75,7 +90,7 @@ def question_thread(request, qid):
     return render(request, 'user/question_thread.html', {'question': question})
 
 
-@login_required()
+@ login_required()
 def like_question(request, id):
     question = get_object_or_404(Question, id=id)
     if request.user not in question.likes.all():
