@@ -21,6 +21,8 @@ services:
   db:
     image: postgres
     container_name: postgres
+    ports:
+      - "5432:5432"
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
@@ -32,17 +34,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  languagetool:
-    image: erikvl87/languagetool
-    container_name: languagetool
-    ports:
-        - 8010:8010  # Using default port from the image
-    environment:
-        - langtool_languageModel=/ngrams  # OPTIONAL: Using ngrams data
-        - Java_Xms=512m  # OPTIONAL: Setting a minimal Java heap size of 512 mib
-        - Java_Xmx=1g  # OPTIONAL: Setting a maximum Java heap size of 1 Gib
-    volumes:
-        - /path/to/ngrams/data:/ngrams
   web:
     container_name: django_web
     build: .
@@ -57,6 +48,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - ELASTICSEARCH_HOST=localhost:9200
     depends_on:
-      - db
-      - elasticsearch
-      - languagetool
+      db:
+          condition: service_healthy 
+      elasticsearch:
+          condition: service_healthy
