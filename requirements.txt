@@ -3,3 +3,4 @@ psycopg2
 Pillow
 django-elasticsearch-dsl
 language-tool-python
+python-decouple

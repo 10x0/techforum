@@ -7,6 +7,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+venv/
 env/
 build/
 develop-eggs/
@@ -60,3 +61,4 @@ target/
 data/
 media/
 esdata/
+.env

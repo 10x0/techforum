@@ -1,11 +1,12 @@
 import os
 from pathlib import Path
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-boi)ad&42#*!4xhlte7(($x6^e)1v4iroq!6)6cv5*#yfn$=68'
+SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = True
+DEBUG = config('DEBUG',cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
@@ -26,7 +27,7 @@ INSTALLED_APPS = [
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'elasticsearch:9200'
+        'hosts': config('ELASTICSEARCH_HOST')
     }
 }
 
@@ -63,11 +64,11 @@ WSGI_APPLICATION = 'techforum.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': 5432,
+        'NAME': config('POSTGRES_NAME'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('POSTGRES_HOST'),
+        'PORT': config('POSTGRES_PORT'),
     }
 }
 
@@ -88,7 +89,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Kathmandu'
+# TIME_ZONE = 'Asia/Kathmandu'
 
 USE_I18N = True
 
