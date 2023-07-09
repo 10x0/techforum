@@ -4,3 +4,4 @@ Pillow==9.5.0
 django-elasticsearch-dsl==7.3
 language-tool-python==2.7.1
 python-decouple==3.8
+gunicorn
