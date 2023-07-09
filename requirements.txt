@@ -1,6 +1,6 @@
-Django
-psycopg2
-Pillow
-django-elasticsearch-dsl
-language-tool-python
-python-decouple
+Django==4.2
+psycopg2==2.9.6
+Pillow==10
+django-elasticsearch-dsl==7.3
+language-tool-python==2.7.1
+python-decouple==3.8
